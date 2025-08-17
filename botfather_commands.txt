@@ -1,0 +1,19 @@
+start - Show help and available commands
+recommend - Get today's song recommendation
+random - Get a completely random song
+discover - Personalized recommendations based on your ratings
+similar - Find songs similar to the last one
+genre - Filter songs by genre (rock/metal/grunge)
+artist - Find songs by specific artist
+search - Search song titles by keyword
+favorite - Mark last song as favorite
+myfavorites - List your favorite songs
+blacklist - Manage songs you never want to hear
+myratings - Show your complete rating history
+stats - Show song ratings and popularity
+toprated - Show highest-rated songs (7.0+)
+quote - Get a random music quote
+trivia - Music trivia quiz
+add - [Admin] Add new song to database
+remove - [Admin] Remove song by ID
+reload - [Admin] Reload song database

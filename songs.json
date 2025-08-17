@@ -1,0 +1,17 @@
+[
+  {"id": 1, "title": "Man in the Box", "artist": "Alice In Chains", "url": "https://www.youtube.com/watch?v=TAqZb52sgpU", "genre": "grunge", "year": 1990},
+  {"id": 2, "title": "Like a Stone", "artist": "Audioslave", "url": "https://www.youtube.com/watch?v=7QU1nvuxaMA", "genre": "rock", "year": 2002},
+  {"id": 3, "title": "Black", "artist": "Pearl Jam", "url": "https://www.youtube.com/watch?v=cs-XZ_dN4Hc", "genre": "grunge", "year": 1991},
+  {"id": 4, "title": "Smells Like Teen Spirit", "artist": "Nirvana", "url": "https://www.youtube.com/watch?v=hTWKbfoikeg", "genre": "grunge", "year": 1991},
+  {"id": 5, "title": "Freak on a Leash", "artist": "Korn", "url": "https://www.youtube.com/watch?v=2s3iGpDqQpQ", "genre": "metal", "year": 1998},
+  {"id": 6, "title": "Chop Suey!", "artist": "System Of A Down", "url": "https://www.youtube.com/watch?v=CSvFpBOe8eY", "genre": "metal", "year": 2001},
+  {"id": 7, "title": "Duality", "artist": "Slipknot", "url": "https://www.youtube.com/watch?v=6fVE8kSM43I", "genre": "metal", "year": 2004},
+  {"id": 8, "title": "Killing in the Name", "artist": "Rage Against The Machine", "url": "https://www.youtube.com/watch?v=bWXazVhlyxQ", "genre": "rock", "year": 1992},
+  {"id": 9, "title": "Paranoid", "artist": "Black Sabbath", "url": "https://www.youtube.com/watch?v=0qanF-91aJo", "genre": "metal", "year": 1970},
+  {"id": 10, "title": "One", "artist": "Metallica", "url": "https://www.youtube.com/watch?v=EzgGTTtR0kc", "genre": "metal", "year": 1988},
+  {"id": 11, "title": "Everlong", "artist": "Foo Fighters", "url": "https://www.youtube.com/watch?v=eBG7P-K-r1Y", "genre": "rock", "year": 1997},
+  {"id": 12, "title": "Black Hole Sun", "artist": "Soundgarden", "url": "https://www.youtube.com/watch?v=3mbBbFH9fAg", "genre": "grunge", "year": 1994},
+  {"id": 13, "title": "Cochise", "artist": "Audioslave", "url": "https://www.youtube.com/watch?v=KDMvN45sjo4", "genre": "rock", "year": 2002},
+  {"id": 14, "title": "Would?", "artist": "Alice In Chains", "url": "https://www.youtube.com/watch?v=Nco_kh8xJDs", "genre": "grunge", "year": 1992},
+  {"id": 15, "title": "Alive", "artist": "Pearl Jam", "url": "https://www.youtube.com/watch?v=VbHS4y7f7eA", "genre": "grunge", "year": 1991}
+]
