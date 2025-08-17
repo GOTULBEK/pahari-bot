@@ -14,6 +14,8 @@ stats - Show song ratings and popularity
 toprated - Show highest-rated songs (7.0+)
 quote - Get a random music quote
 trivia - Music trivia quiz
+battle - Song vs song voting battles
+battlestats - Battle leaderboard and statistics
 add - [Admin] Add new song to database
 remove - [Admin] Remove song by ID
 reload - [Admin] Reload song database

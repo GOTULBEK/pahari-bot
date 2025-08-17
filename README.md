@@ -29,6 +29,8 @@ A feature-rich Telegram bot for music discovery and rating with personalized rec
 ### 🎮 Fun Features
 - `/quote` - Get random music quotes
 - `/trivia` - **NEW!** Music trivia quiz with multiple choice questions
+- `/battle` - **NEW!** Song vs song voting battles (like "Black vs One")
+- `/battlestats` - **NEW!** Battle leaderboard with win/loss records
 
 ### 🔧 Admin Commands
 - `/add [title] [artist] [url] [genre] [year]` - Add new songs
@@ -118,6 +120,8 @@ Songs are stored in `songs.json` with the following structure:
 | `/stats` | All song statistics | |
 | `/toprated` | Community favorites | |
 | `/quote` | Random music quote | |
+| `/battle` | Song vs song voting | |
+| `/battlestats` | Battle leaderboard | |
 
 **Admin only:**
 | Command | Description | Example |
@@ -146,6 +150,7 @@ Songs are stored in `songs.json` with the following structure:
 - **Emoji-Rich Polls:** Beautiful 1️⃣-🔟 rating system
 - **Dual Favorites:** Both explicit favorites (`/favorite`) and high ratings (8+) in `/myfavorites`
 - **Smart Trivia:** Dynamic quiz questions based on your song database
+- **Song Battles:** Head-to-head voting with win/loss tracking and leaderboards
 - **Contextual Commands:** `/similar` works with your last recommendation
 
 ## 🔮 Future Enhancements

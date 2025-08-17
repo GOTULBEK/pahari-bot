@@ -875,6 +875,225 @@ async def trivia_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.effective_message.reply_text("Sorry, an error occurred. Please try again later.")
 
 
+async def battle_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Start a song battle - vote between two random songs."""
+    user_id = str(update.effective_user.id)
+    chat_id = update.effective_chat.id
+    logging.info(f"Received /battle command from user {user_id}")
+    
+    try:
+        songs = load_songs()
+        if len(songs) < 2:
+            await update.effective_message.reply_text("Need at least 2 songs for battles!")
+            return
+        
+        # Filter out blacklisted songs
+        filtered_songs = filter_blacklisted_songs(songs, user_id)
+        if len(filtered_songs) < 2:
+            await update.effective_message.reply_text("Not enough songs available for battle (some may be blacklisted).")
+            return
+        
+        # Pick two random songs
+        battle_songs = random.sample(filtered_songs, 2)
+        song1, song2 = battle_songs
+        
+        # Create battle info
+        battle_id = f"{chat_id}_{int(datetime.now().timestamp())}"
+        
+        # Create poll for battle
+        song1_option = f"🎵 {song1.get('title')} — {song1.get('artist')}"
+        song2_option = f"🎵 {song2.get('title')} — {song2.get('artist')}"
+        
+        question = "🥊 SONG BATTLE! Which song is better?"
+        
+        # Send battle description first
+        battle_text = f"""🥊 **SONG BATTLE!**
+
+**Fighter 1:** {song1.get('title')} — {song1.get('artist')}
+🎵 Genre: {song1.get('genre')} | Year: {song1.get('year', 'Unknown')}
+{song1.get('url', '')}
+
+🆚
+
+**Fighter 2:** {song2.get('title')} — {song2.get('artist')}
+🎵 Genre: {song2.get('genre')} | Year: {song2.get('year', 'Unknown')}
+{song2.get('url', '')}
+
+Vote for your favorite! 👇"""
+        
+        await context.bot.send_message(chat_id=chat_id, text=battle_text, parse_mode='Markdown')
+        
+        # Send the battle poll
+        poll = await context.bot.send_poll(
+            chat_id=chat_id,
+            question=question,
+            options=[song1_option, song2_option],
+            allows_multiple_answers=False,
+            is_anonymous=False,
+        )
+        
+        # Store battle context for tracking
+        context.bot_data[f"battle_{poll.poll.id}"] = {
+            "battle_id": battle_id,
+            "song1": {
+                "id": song1.get("id"),
+                "title": song1.get("title"),
+                "artist": song1.get("artist")
+            },
+            "song2": {
+                "id": song2.get("id"), 
+                "title": song2.get("title"),
+                "artist": song2.get("artist")
+            },
+            "chat_id": chat_id,
+            "start_time": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in battle command: {e}")
+        await update.effective_message.reply_text("Sorry, an error occurred. Please try again later.")
+
+
+async def battle_stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show battle statistics."""
+    user_id = str(update.effective_user.id)
+    logging.info(f"Received /battlestats command from user {user_id}")
+    
+    try:
+        user_data = load_user_data()
+        battles = user_data.get("battles", {})
+        
+        if not battles:
+            await update.effective_message.reply_text("No battle data available yet! Start some battles with /battle")
+            return
+        
+        songs = load_songs()
+        song_dict = {str(song.get("id")): song for song in songs}
+        
+        # Calculate battle statistics
+        song_wins = {}
+        song_losses = {}
+        total_battles = 0
+        
+        for battle_id, battle_data in battles.items():
+            if "votes" not in battle_data:
+                continue
+                
+            votes = battle_data["votes"]
+            if not votes:
+                continue
+                
+            # Count votes for each song
+            song1_votes = sum(1 for vote in votes.values() if vote == 0)
+            song2_votes = sum(1 for vote in votes.values() if vote == 1)
+            
+            if song1_votes == song2_votes:
+                continue  # Skip ties
+            
+            winner_id = battle_data["song1"]["id"] if song1_votes > song2_votes else battle_data["song2"]["id"]
+            loser_id = battle_data["song2"]["id"] if song1_votes > song2_votes else battle_data["song1"]["id"]
+            
+            winner_id = str(winner_id)
+            loser_id = str(loser_id)
+            
+            song_wins[winner_id] = song_wins.get(winner_id, 0) + 1
+            song_losses[loser_id] = song_losses.get(loser_id, 0) + 1
+            total_battles += 1
+        
+        if total_battles == 0:
+            await update.effective_message.reply_text("No completed battles yet! Vote in some battles to see stats.")
+            return
+        
+        # Create leaderboard
+        all_song_ids = set(song_wins.keys()) | set(song_losses.keys())
+        song_records = []
+        
+        for song_id in all_song_ids:
+            if song_id in song_dict:
+                wins = song_wins.get(song_id, 0)
+                losses = song_losses.get(song_id, 0)
+                total = wins + losses
+                win_rate = (wins / total * 100) if total > 0 else 0
+                
+                song_records.append({
+                    "song": song_dict[song_id],
+                    "wins": wins,
+                    "losses": losses,
+                    "win_rate": win_rate,
+                    "total": total
+                })
+        
+        # Sort by win rate, then by total battles
+        song_records.sort(key=lambda x: (x["win_rate"], x["total"]), reverse=True)
+        
+        result_text = f"🥊 **BATTLE LEADERBOARD** ({total_battles} battles)\n\n"
+        
+        for i, record in enumerate(song_records[:10], 1):
+            song = record["song"]
+            wins = record["wins"]
+            losses = record["losses"]
+            win_rate = record["win_rate"]
+            
+            if i <= 3:
+                medal = ["🥇", "🥈", "🥉"][i-1]
+            else:
+                medal = f"{i}."
+            
+            result_text += f"{medal} {song.get('title')} — {song.get('artist')}\n"
+            result_text += f"   🏆 {wins}W-{losses}L ({win_rate:.1f}% win rate)\n\n"
+        
+        # User-specific stats
+        user_votes = 0
+        for battle_data in battles.values():
+            if "votes" in battle_data and user_id in battle_data["votes"]:
+                user_votes += 1
+        
+        result_text += f"📊 You've voted in {user_votes} battles"
+        
+        await update.effective_message.reply_text(result_text, parse_mode='Markdown')
+        
+    except Exception as e:
+        logging.error(f"Error in battlestats command: {e}")
+        await update.effective_message.reply_text("Sorry, an error occurred. Please try again later.")
+
+
+async def handle_battle_poll_answer(poll_answer, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle battle poll answers separately from rating polls."""
+    poll_id = poll_answer.poll_id
+    user_id = str(poll_answer.user.id)
+    option_ids = poll_answer.option_ids
+    
+    if not option_ids:
+        return
+    
+    battle_context = context.bot_data.get(f"battle_{poll_id}")
+    if not battle_context:
+        return  # Not a battle poll
+    
+    battle_id = battle_context["battle_id"]
+    chosen_option = option_ids[0]  # 0 for song1, 1 for song2
+    
+    # Save the battle vote
+    user_data = load_user_data()
+    if "battles" not in user_data:
+        user_data["battles"] = {}
+    
+    if battle_id not in user_data["battles"]:
+        user_data["battles"][battle_id] = {
+            "song1": battle_context["song1"],
+            "song2": battle_context["song2"], 
+            "start_time": battle_context["start_time"],
+            "votes": {}
+        }
+    
+    user_data["battles"][battle_id]["votes"][user_id] = chosen_option
+    save_user_data(user_data)
+    
+    # Get winner info for logging
+    winner_song = battle_context["song1"] if chosen_option == 0 else battle_context["song2"]
+    logging.info(f"User {user_id} voted for {winner_song['title']} in battle {battle_id}")
+
+
 async def add_song(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add new song (admin only)."""
     user_id = update.effective_user.id
@@ -1002,7 +1221,7 @@ async def send_rating_poll(context: ContextTypes.DEFAULT_TYPE, chat_id: int, son
 
 
 async def handle_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle poll answers for song ratings."""
+    """Handle poll answers for both song ratings and battles."""
     poll_answer = update.poll_answer
     poll_id = poll_answer.poll_id
     user_id = str(poll_answer.user.id)
@@ -1011,6 +1230,13 @@ async def handle_poll_answer(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if not option_ids:
         return
     
+    # Check if it's a battle poll first
+    battle_context = context.bot_data.get(f"battle_{poll_id}")
+    if battle_context:
+        await handle_battle_poll_answer(poll_answer, context)
+        return
+    
+    # Handle rating poll
     poll_context = context.bot_data.get(f"poll_{poll_id}")
     if not poll_context:
         return
@@ -1063,6 +1289,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 **🎮 Fun Features:**
 /quote - Get a random music quote
 /trivia - Music trivia quiz
+/battle - Song vs song voting battles
+/battlestats - Battle leaderboard and statistics
 
 **🔧 Admin Commands:**
 /add [title] [artist] [url] [genre] [year] - Add new song
@@ -1118,6 +1346,8 @@ def build_app() -> Application:
     app.add_handler(CommandHandler("discover", discover_command))
     app.add_handler(CommandHandler("similar", similar_command))
     app.add_handler(CommandHandler("trivia", trivia_command))
+    app.add_handler(CommandHandler("battle", battle_command))
+    app.add_handler(CommandHandler("battlestats", battle_stats_command))
     app.add_handler(CommandHandler("add", add_song))
     app.add_handler(CommandHandler("remove", remove_song))
     app.add_handler(CommandHandler("reload", reload_songs))
