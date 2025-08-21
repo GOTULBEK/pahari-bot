@@ -6,16 +6,22 @@
   "blacklist": {},
   "last_songs": {
     "2100114055": {
-      "song_id": 34,
-      "title": "God Save The Queen",
-      "artist": "Sex Pistols",
-      "timestamp": "2025-08-17T18:23:11.467238"
+      "song_id": 11,
+      "title": "Everlong",
+      "artist": "Foo Fighters",
+      "timestamp": "2025-08-21T16:12:11.504364"
     },
-    "1104354642": {
-      "song_id": 52,
-      "title": "Back in Black",
-      "artist": "AC/DC",
-      "timestamp": "2025-08-20T20:48:46.501570"
+    "1128228122": {
+      "song_id": 10,
+      "title": "One",
+      "artist": "Metallica",
+      "timestamp": "2025-08-21T16:15:11.944521"
+    },
+    "1058936090": {
+      "song_id": 11,
+      "title": "Everlong",
+      "artist": "Foo Fighters",
+      "timestamp": "2025-08-21T16:12:42.599841"
     }
   },
   "battles": {}
